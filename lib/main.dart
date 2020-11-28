@@ -1,7 +1,13 @@
 import 'dart:core';
 
+import 'package:farmpam/addProduct.dart';
+import 'package:farmpam/profile.dart';
+import 'package:farmpam/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+
+import 'home.dart';
+import 'signIn.dart';
 
 final SIGNIN = './signIn';
 final SIGNUP = './signUp';
@@ -26,6 +32,10 @@ class farmPam extends StatelessWidget {
       initialRoute: SIGNIN,
       routes: {
         SIGNIN: (context) => signInPage(),
+        HOME: (context) => homePage(),
+        ADDPRODUCT: (context) => addProductPage(),
+        SETTINGS: (context) => settingPage(),
+        PROFILE: (context) => profilePage(),
         //add other pages above.
       },
     );
