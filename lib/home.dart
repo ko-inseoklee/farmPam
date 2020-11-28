@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:farmpam/signIn.dart';
 import 'package:flutter/material.dart';
 import 'assets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
-
-DocumentReference currentUser;
 
 class homePage extends StatefulWidget {
   @override
@@ -13,6 +12,10 @@ class homePage extends StatefulWidget {
 }
 
 class _homePageState extends State<homePage> {
+  CollectionReference users = FirebaseFirestore.instance.collection("users");
+  CollectionReference products =
+      FirebaseFirestore.instance.collection("product");
+
   String title = 'Main page';
 
   String get documentId => null;
@@ -20,59 +23,47 @@ class _homePageState extends State<homePage> {
   @override
   Widget build(BuildContext context) {
     User user = _auth.currentUser;
-    // print(user);
+    print("currentuser == $currentUser");
 
-    bool containsID = false;
+    return Scaffold(
+      appBar: header(context, title),
+      body: ListView(
+        children: <Widget>[
+          Container(
+            child: Text("Search"),
+          ),
+          Center(
+            child: SizedBox(
+              height: 80,
+            ),
+          ),
+          Container(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: products.snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                return ListView(
+                  shrinkWrap: true,
+                  children: snapshot.data.docs.map((DocumentSnapshot document) {
+                    if (snapshot.hasError) {
+                      print('Something went wrong');
+                    }
 
-    CollectionReference users = FirebaseFirestore.instance.collection("users");
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      print("loading");
+                    }
 
-    return StreamBuilder<QuerySnapshot>(
-      stream: users.snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) {
-          print("something wrong");
-        }
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          print("wait..");
-        }
-
-        snapshot.data.docs.map((DocumentSnapshot document) {
-          String temp = document.data()['uid'];
-          if (temp == user.uid) {
-            currentUser = document.reference;
-            containsID = true;
-          }
-        }).toList();
-
-        if (!containsID) {
-          users.add({
-            'address': "",
-            'cart': "",
-            'chatList': [],
-            'description': '',
-            'favorite': [],
-            'like': [],
-            'isVerified': true,
-            'location': '',
-            'nickName': user.displayName,
-            'sellingProducts': [],
-            'uid': user.uid
-          }).then((value) => currentUser = value);
-        }
-
-        return Scaffold(
-          appBar: header(context, title),
-          // body: new ListView(
-          //   children: snapshot.data.docs.map((DocumentSnapshot document) {
-          //     return new ListTile(
-          //       title: new Text(document.data()['nickName']),
-          //     );
-          //   }).toList(),
-          // ),
-          body: Text("test"),
-          bottomNavigationBar: footer(context),
-        );
-      },
+                    return ListTile(
+                      title: Text(document.data()['name']),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+          )
+        ],
+      ),
+      bottomNavigationBar: footer(context),
     );
   }
 }

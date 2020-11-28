@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/main.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -9,6 +10,10 @@ import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'assets.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
+
+DocumentReference currentUser;
+bool containsID = false;
+User user = _auth.currentUser;
 
 class signInPage extends StatefulWidget {
   @override
@@ -49,23 +54,37 @@ class _signInWithGoogle extends StatefulWidget {
 }
 
 class __signInWithGoogleState extends State<_signInWithGoogle> {
+  CollectionReference users = FirebaseFirestore.instance.collection("users");
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Container(
-            padding: EdgeInsets.only(top: 16.0),
-            alignment: Alignment.center,
-            child: SignInButton(Buttons.GoogleDark, text: "Google",
-                onPressed: () async {
-              _signInWithInGoogle();
-            }),
-          )),
+    return StreamBuilder<QuerySnapshot>(
+      stream: users.snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          print("something wrong");
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          print("wait..");
+        }
+
+        return Card(
+          child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Container(
+                padding: EdgeInsets.only(top: 16.0),
+                alignment: Alignment.center,
+                child: SignInButton(Buttons.GoogleDark, text: "Google",
+                    onPressed: () async {
+                  _signInWithInGoogle(snapshot);
+                }),
+              )),
+        );
+      },
     );
   }
 
-  void _signInWithInGoogle() async {
+  void _signInWithInGoogle(AsyncSnapshot<QuerySnapshot> snapshot) async {
     try {
       UserCredential userCredential;
 
@@ -83,12 +102,40 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
         );
         userCredential = await _auth.signInWithCredential(googleAuthCredential);
       }
-      final user = userCredential.user;
+
+      await configuration(snapshot);
+
       Navigator.pushNamed(context, HOME);
     } catch (e) {
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text("Failed to sign in with Google: ${e}"),
       ));
+    }
+  }
+
+  Future<void> configuration(AsyncSnapshot<QuerySnapshot> snapshot) async {
+    snapshot.data.docs.map((DocumentSnapshot document) {
+      String temp = document.data()['uid'];
+      if (temp == user.uid) {
+        currentUser = document.reference;
+        containsID = true;
+      }
+    }).toList();
+
+    if (!containsID) {
+      users.add({
+        'address': "",
+        'cart': "",
+        'chatList': [],
+        'description': '',
+        'favorite': [],
+        'like': [],
+        'isVerified': true,
+        'location': '',
+        'nickName': user.displayName,
+        'sellingProducts': [],
+        'uid': user.uid
+      }).then((value) => currentUser = value);
     }
   }
 }
