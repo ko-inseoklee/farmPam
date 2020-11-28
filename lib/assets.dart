@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 
 Widget header(BuildContext context, String pageTitle) {
   return AppBar(
-    leading: IconButton(
-      icon: Icon(Icons.person),
-      onPressed: () => Navigator.pushNamed(context, PROFILE),
-    ),
     title: Text(pageTitle),
     centerTitle: true,
     actions: [
@@ -14,6 +10,9 @@ Widget header(BuildContext context, String pageTitle) {
       IconButton(
           icon: Icon(Icons.add),
           onPressed: () => Navigator.pushNamed(context, ADDPRODUCT)),
+      IconButton(
+          icon: Icon(Icons.person),
+          onPressed: () => Navigator.pushNamed(context, PROFILE)),
       IconButton(
           icon: Icon(Icons.settings),
           onPressed: () => Navigator.pushNamed(context, SETTINGS))

@@ -86,7 +86,9 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
       final user = userCredential.user;
       Navigator.pushNamed(context, HOME);
     } catch (e) {
-      print(e);
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text("Failed to sign in with Google: ${e}"),
+      ));
     }
   }
 }
