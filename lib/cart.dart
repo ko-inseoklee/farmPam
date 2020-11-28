@@ -1,13 +1,13 @@
 import 'package:farmpam/assets.dart';
 import 'package:flutter/material.dart';
 
-class settingPage extends StatefulWidget {
+class cartPage extends StatefulWidget {
   @override
-  _settingPageState createState() => _settingPageState();
+  _cartPageState createState() => _cartPageState();
 }
 
-class _settingPageState extends State<settingPage> {
-  String title = "Settings";
+class _cartPageState extends State<cartPage> {
+  String title = "My cart";
 
   @override
   Widget build(BuildContext context) {

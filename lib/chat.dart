@@ -1,13 +1,14 @@
 import 'package:farmpam/assets.dart';
 import 'package:flutter/material.dart';
 
-class settingPage extends StatefulWidget {
+class chatListPage extends StatefulWidget {
   @override
-  _settingPageState createState() => _settingPageState();
+  _chatListPageState createState() => _chatListPageState();
 }
 
-class _settingPageState extends State<settingPage> {
-  String title = "Settings";
+class _chatListPageState extends State<chatListPage> {
+  //Todo: title will be friend name.
+  String title = "chat";
 
   @override
   Widget build(BuildContext context) {

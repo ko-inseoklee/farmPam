@@ -1,4 +1,4 @@
-import 'package:farmpam/header.dart';
+import 'package:farmpam/assets.dart';
 import 'package:flutter/material.dart';
 
 class profilePage extends StatefulWidget {
@@ -13,6 +13,7 @@ class _profilePageState extends State<profilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: header(context, title),
+      bottomNavigationBar: footer(context),
     );
   }
 }

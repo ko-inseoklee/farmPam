@@ -23,3 +23,30 @@ Widget header(BuildContext context, String pageTitle) {
     ],
   );
 }
+
+Widget footer(BuildContext context) {
+  List<String> routeList = [CHATLIST, HOME, CART];
+
+  return BottomNavigationBar(
+    items: const <BottomNavigationBarItem>[
+      BottomNavigationBarItem(
+        icon: Icon(Icons.chat_bubble_outline),
+        label: "Messages",
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.home),
+        label: "Home",
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.shopping_cart),
+        label: "My cart",
+      ),
+    ],
+    //TODO:Change the color proper.
+    selectedItemColor: Colors.grey,
+    unselectedItemColor: Colors.grey,
+    onTap: (index) {
+      Navigator.pushNamed(context, routeList[index]);
+    },
+  );
+}

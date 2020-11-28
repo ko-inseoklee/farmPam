@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'assets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-import 'header.dart';
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class homePage extends StatefulWidget {
   @override
@@ -11,9 +13,14 @@ class _homePageState extends State<homePage> {
   String title = 'Main page';
   @override
   Widget build(BuildContext context) {
+    User user = _auth.currentUser;
+
+    print(user);
+
     return Scaffold(
       appBar: header(context, title),
-      body: Text("this is home page!"),
+      body: Text(""),
+      bottomNavigationBar: footer(context),
     );
   }
 }
