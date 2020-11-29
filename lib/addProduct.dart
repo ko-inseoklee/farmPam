@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/assets.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,7 @@ class _addProductPageState extends State<addProductPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: header(context, title),
+      appBar: header(context, title, false),
       bottomNavigationBar: footer(context),
     );
   }

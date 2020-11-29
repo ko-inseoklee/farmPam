@@ -1,7 +1,9 @@
 import 'dart:core';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/addProduct.dart';
 import 'package:farmpam/chatList.dart';
+import 'package:farmpam/productDetail.dart';
 import 'package:farmpam/profile.dart';
 import 'package:farmpam/settings.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +45,7 @@ class farmPam extends StatelessWidget {
         //add other pages above.
         CHATLIST: (context) => chatListPage(),
         CART: (context) => cartPage(),
+        PRODUCTDETAIL: (context) => productDetailPage()
       },
     );
   }

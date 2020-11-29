@@ -102,9 +102,9 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
         );
         userCredential = await _auth.signInWithCredential(googleAuthCredential);
       }
+      final user = userCredential.user;
 
       await configuration(snapshot);
-
       Navigator.pushNamed(context, HOME);
     } catch (e) {
       Scaffold.of(context).showSnackBar(SnackBar(
@@ -114,8 +114,8 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
   }
 
   Future<void> configuration(AsyncSnapshot<QuerySnapshot> snapshot) async {
-    snapshot.data.docs.map((DocumentSnapshot document) {
-      String temp = document.data()['uid'];
+    snapshot.data.docs.map((DocumentSnapshot document) async {
+      String temp = await document.data()['uid'];
       if (temp == user.uid) {
         currentUser = document.reference;
         containsID = true;
@@ -123,19 +123,24 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
     }).toList();
 
     if (!containsID) {
-      users.add({
+      await users.add({
         'address': "",
         'cart': "",
         'chatList': [],
-        'description': '',
         'favorite': [],
         'like': [],
         'isVerified': true,
-        'location': '',
         'nickName': user.displayName,
         'sellingProducts': [],
-        'uid': user.uid
-      }).then((value) => currentUser = value);
+        'uid': user.uid,
+        'farmDescription': '',
+        'farmImage': '',
+        'farmReview': [],
+        'farmName': '',
+        'farmLocation': '',
+        'image': '',
+      }).then((value) => {currentUser = value});
     }
+    print("signin=$currentUser");
   }
 }

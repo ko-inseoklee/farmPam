@@ -1,15 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/main.dart';
 import 'package:flutter/material.dart';
 
-Widget header(BuildContext context, String pageTitle) {
+Widget header(BuildContext context, String pageTitle, bool isCreater) {
   return AppBar(
     title: Text(pageTitle),
     centerTitle: true,
     actions: [
       // TODO: Change add button to write button.
-      IconButton(
-          icon: Icon(Icons.add),
-          onPressed: () => Navigator.pushNamed(context, ADDPRODUCT)),
+      isCreater
+          ? IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () => Navigator.pushNamed(context, ADDPRODUCT))
+          : Text(""),
       IconButton(
           icon: Icon(Icons.person),
           onPressed: () => Navigator.pushNamed(context, PROFILE)),
@@ -47,5 +50,30 @@ Widget footer(BuildContext context) {
     onTap: (index) {
       Navigator.pushNamed(context, routeList[index]);
     },
+  );
+}
+
+Widget buildListTile(BuildContext context, DocumentSnapshot documentSnapshot) {
+  return ListTile(
+    //TODO: getURL after Image upload.
+    //TODO: set condition between default and image
+    leading: true /*documentSnapshot.data()['name'] == '1'*/
+        ? Image.network(
+            "https://kubalubra.is/wp-content/uploads/2017/11/default-thumbnail.jpg")
+        : Image.network(documentSnapshot.data()['name']),
+    title: Text(documentSnapshot.data()['name']),
+    subtitle: Text(
+        documentSnapshot.data()['description'].toString().substring(0, 10) +
+            '...'),
+    trailing: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(documentSnapshot.data()['starRating'].toString()),
+        Text('₩' + documentSnapshot.data()['price'].toString()),
+        Text(documentSnapshot.data()['location']),
+      ],
+    ),
+    onTap: () => Navigator.pushNamed(context, PRODUCTDETAIL,
+        arguments: documentSnapshot.reference),
   );
 }

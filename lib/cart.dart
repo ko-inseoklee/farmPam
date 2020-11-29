@@ -12,7 +12,7 @@ class _cartPageState extends State<cartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: header(context, title),
+      appBar: header(context, title, true),
       bottomNavigationBar: footer(context),
     );
   }

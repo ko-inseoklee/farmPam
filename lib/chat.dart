@@ -13,7 +13,7 @@ class _chatListPageState extends State<chatListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: header(context, title),
+      appBar: header(context, title, true),
       bottomNavigationBar: footer(context),
     );
   }
