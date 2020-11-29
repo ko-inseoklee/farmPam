@@ -15,3 +15,9 @@ For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 # farmPam
+  - 0.2 
+    Product Detail Page : handling update product button whether the current user is the author or not.
+    Setting page :  sign out
+    Home page : Make basic layout of ListTile and add listtile to asset.dart.
+    Error handling : fix Error occuring when the user sign in at first.
+                    
