@@ -16,8 +16,8 @@ For help getting started with Flutter, view our
 samples, guidance on mobile development, and a full API reference.
 # farmPam
   - 0.2 
-    Product Detail Page : handling update product button whether the current user is the author or not.
-    Setting page :  sign out
-    Home page : Make basic layout of ListTile and add listtile to asset.dart.
-    Error handling : fix Error occuring when the user sign in at first.
+    1. Product Detail Page : handling update product button whether the current user is the author or not.
+    2. Setting page :  sign out
+    3. Home page : Make basic layout of ListTile and add listtile to asset.dart.
+    4. Error handling : fix Error occuring when the user sign in at first.
                     
