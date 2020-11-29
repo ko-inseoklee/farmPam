@@ -36,9 +36,31 @@ class _signInPageState extends State<signInPage> {
             children: <Widget>[
               //Todo: Insert icon into this container
               Container(
-                alignment: Alignment.center,
-                child: Text("Icon"),
-              ),
+                  alignment: Alignment.center,
+                  height: 350,
+                  width: 300,
+                  child: Column(
+                    children: [
+                      Image.asset('assets/farmer.png',
+                          width: 125, height: 250, fit: BoxFit.fill),
+                      Text(
+                        "팜팜",
+                        style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepOrangeAccent,
+                        ),
+                      ),
+                      Text(
+                        "농가와 시민의 직거래 어플리케이션",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orangeAccent,
+                        ),
+                      )
+                    ],
+                  )),
               _signInWithGoogle(),
             ],
           ),
@@ -69,16 +91,34 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
         }
 
         return Card(
+          elevation: 20,
+          color: Colors.deepOrange,
+          shadowColor: Colors.deepOrange,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(40.0),
+          ),
           child: Padding(
               padding: EdgeInsets.all(16),
               child: Container(
-                padding: EdgeInsets.only(top: 16.0),
-                alignment: Alignment.center,
-                child: SignInButton(Buttons.GoogleDark, text: "Google",
-                    onPressed: () async {
-                  _signInWithInGoogle(snapshot);
-                }),
-              )),
+                  padding: EdgeInsets.only(top: 16.0),
+                  alignment: Alignment.center,
+                  child: Column(
+                    children: [
+                      Text(
+                        "로그인하고 나만의 농장을 찾아보세요",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      //SizedBox(height: 120),
+                      SignInButton(Buttons.Google, text: "Sign in with Google",
+                          onPressed: () async {
+                        _signInWithInGoogle(snapshot);
+                      }),
+                    ],
+                  ))),
         );
       },
     );

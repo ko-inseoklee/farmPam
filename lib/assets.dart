@@ -54,6 +54,11 @@ Widget footer(BuildContext context) {
 }
 
 Widget buildListTile(BuildContext context, DocumentSnapshot documentSnapshot) {
+  String _description = documentSnapshot.data()['description'];
+  if (_description.length >= 10) {
+    _description = _description.substring(0, 10);
+  }
+
   return ListTile(
     //TODO: getURL after Image upload.
     //TODO: set condition between default and image
@@ -62,9 +67,7 @@ Widget buildListTile(BuildContext context, DocumentSnapshot documentSnapshot) {
             "https://kubalubra.is/wp-content/uploads/2017/11/default-thumbnail.jpg")
         : Image.network(documentSnapshot.data()['name']),
     title: Text(documentSnapshot.data()['name']),
-    subtitle: Text(
-        documentSnapshot.data()['description'].toString().substring(0, 10) +
-            '...'),
+    subtitle: Text(_description + '...'),
     trailing: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
