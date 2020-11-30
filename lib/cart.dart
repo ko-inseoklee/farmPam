@@ -86,6 +86,7 @@ class _cartPageState extends State<cartPage> {
             onTap: () => Navigator.pushNamed(context, PRODUCTDETAIL,
                 arguments: documentSnapshot.reference),
             onLongPress: () {
+              //TODO: have to build delete dialog.
               print("delete");
             },
           );
