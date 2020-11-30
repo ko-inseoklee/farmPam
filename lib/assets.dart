@@ -63,8 +63,7 @@ Widget buildListTile(BuildContext context, DocumentSnapshot documentSnapshot) {
     //TODO: getURL after Image upload.
     //TODO: set condition between default and image
     leading: true /*documentSnapshot.data()['name'] == '1'*/
-        ? Image.network(
-            "https://kubalubra.is/wp-content/uploads/2017/11/default-thumbnail.jpg")
+        ? Image.network(defaultURL)
         : Image.network(documentSnapshot.data()['name']),
     title: Text(documentSnapshot.data()['name']),
     subtitle: Text(_description + '...'),

@@ -6,6 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'signIn.dart';
 import 'farmPage.dart';
 
+Stream<DocumentSnapshot> cSnapshots = currentUser.snapshots();
+
 class profilePage extends StatefulWidget {
   @override
   _profilePageState createState() => _profilePageState();
@@ -30,7 +32,7 @@ class _profilePageState extends State<profilePage> {
     printf(userRef);
 
     return StreamBuilder<DocumentSnapshot>(
-        stream: currentUser.snapshots(),
+        stream: cSnapshots,
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> document) {
           print("this is docu $document");
@@ -40,10 +42,10 @@ class _profilePageState extends State<profilePage> {
           if (document.connectionState == ConnectionState.waiting) {
             print("wait..");
           }
-          address_ = document.data['address'];
-          nickName_ = document.data['nickName'];
-          sellingProducts_ = document.data['sellingProducts'];
-          imageReference = document.data['image'];
+          // address_ = document.data['address'];
+          // nickName_ = document.data['nickName'];
+          // sellingProducts_ = document.data['sellingProducts'];
+          // imageReference = document.data['image'];
 
           return Scaffold(
             appBar: header(context, title, true),
@@ -72,13 +74,13 @@ class _profilePageState extends State<profilePage> {
                       width: 150,
                       child: Column(
                         children: <Widget>[
-                          Text(nickName_),
+                          Text(document.data['nickName']),
                           Container(
                             height: 1,
                             width: 50,
                             color: Colors.grey,
                           ),
-                          Text(address_),
+                          Text(document.data['address']),
                         ],
                       ))
                 ],

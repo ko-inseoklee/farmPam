@@ -23,6 +23,9 @@ final ADDPRODUCT = './addProduct';
 final CHATLIST = './chatList';
 final CART = './cart';
 
+final defaultURL =
+    "https://kubalubra.is/wp-content/uploads/2017/11/default-thumbnail.jpg";
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();

@@ -11,6 +11,8 @@ import 'assets.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
+FirebaseFirestore firestore = FirebaseFirestore.instance;
+
 DocumentReference currentUser;
 bool containsID = false;
 User user = _auth.currentUser;
@@ -161,6 +163,14 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
         containsID = true;
       }
     }).toList();
+
+    // firestore
+    //     .collection("user")
+    //     .doc(docRef)
+    //     .get()
+    //     .then((DocumentSnapshot snapshot) async {
+    //   creator = await snapshot.data()['creatorID'];
+    // });
 
     if (!containsID) {
       await users.add({
