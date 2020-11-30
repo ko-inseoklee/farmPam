@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 import 'main.dart';
 
-List<dynamic> cartList;
+List<dynamic> cartList = new List<dynamic>();
 
 List<String> _name = new List<String>();
 List<String> _image = new List<String>();
@@ -30,6 +30,7 @@ class _cartPageState extends State<cartPage> {
   @override
   Widget build(BuildContext context) {
     //this statement will be inserted in the builder.
+    int i = 0;
     FirebaseFirestore.instance
         .collection("users")
         .doc(currentUser.id)
@@ -38,13 +39,22 @@ class _cartPageState extends State<cartPage> {
       cartList = await snapshot.data()['cart'];
     });
 
-    print("cartlist == $cartList");
+    //
+    print("cartlist == ${cartList}");
 
     return Scaffold(
       appBar: header(context, title, true),
       body: ListView.builder(
-        itemCount: cartList.length,
+        itemCount: cartList == null ? 1 : cartList.length,
         itemBuilder: (context, index) {
+          if (cartList == null) {
+            return Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                  "There is no stored product! Add the product in your cart!"),
+            );
+          }
           //
           DocumentReference documentReference = FirebaseFirestore.instance
               .collection("product")
@@ -96,3 +106,5 @@ class _cartPageState extends State<cartPage> {
     );
   }
 }
+
+//TODO: cart가 null일때 해결해야함.

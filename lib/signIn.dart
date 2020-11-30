@@ -175,7 +175,7 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
     if (!containsID) {
       await users.add({
         'address': "",
-        'cart': "",
+        'cart': [],
         'chatList': [],
         'favorite': [],
         'like': [],
