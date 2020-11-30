@@ -20,4 +20,5 @@ samples, guidance on mobile development, and a full API reference.
     2. Setting page :  sign out
     3. Home page : Make basic layout of ListTile and add listtile to asset.dart.
     4. Error handling : fix Error occuring when the user sign in at first.
-                    
+    5. Add Page : build all functions of add pages excepted using storage.
+    6. Design - Signin page.
