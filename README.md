@@ -22,3 +22,7 @@ samples, guidance on mobile development, and a full API reference.
     4. Error handling : fix Error occuring when the user sign in at first.
     5. Add Page : build all functions of add pages excepted using storage.
     6. Design - Signin page.
+
+  - 0.21v (20.12.03)
+    1. Fixed error 1 - that when existing user is signed in, data in the user database was duplicated.
+    2. Fixed error 2 - build the cart page. 
