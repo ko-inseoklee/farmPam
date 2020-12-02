@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/main.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -117,7 +119,7 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
                       //SizedBox(height: 120),
                       SignInButton(Buttons.Google, text: "Sign in with Google",
                           onPressed: () async {
-                        _signInWithInGoogle(snapshot);
+                        await _signInWithInGoogle(snapshot);
                       }),
                     ],
                   ))),
@@ -126,7 +128,8 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
     );
   }
 
-  void _signInWithInGoogle(AsyncSnapshot<QuerySnapshot> snapshot) async {
+  Future<void> _signInWithInGoogle(
+      AsyncSnapshot<QuerySnapshot> snapshot) async {
     try {
       UserCredential userCredential;
 
@@ -159,8 +162,12 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
     snapshot.data.docs.map((DocumentSnapshot document) async {
       String temp = await document.data()['uid'];
       if (temp == user.uid) {
+        print("user in configuration : ${user.uid}");
+        print("this is document ref !! = ${document.reference}");
         currentUser = document.reference;
         containsID = true;
+
+        print("this is ID == $containsID");
       }
     }).toList();
 
@@ -171,26 +178,8 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
     //     .then((DocumentSnapshot snapshot) async {
     //   creator = await snapshot.data()['creatorID'];
     // });
+    // sleep(Duration.zero);
 
-    if (!containsID) {
-      await users.add({
-        'address': "",
-        'cart': [],
-        'chatList': [],
-        'favorite': [],
-        'like': [],
-        'isVerified': true,
-        'nickName': user.displayName,
-        'sellingProducts': [],
-        'uid': user.uid,
-        'farmDescription': '',
-        'farmImage': '',
-        'farmReview': [],
-        'farmName': '',
-        'farmLocation': '',
-        'image': '',
-      }).then((value) => {currentUser = value});
-    }
-    print("signin=$currentUser");
+    // print("signin=$currentUser");
   }
 }
