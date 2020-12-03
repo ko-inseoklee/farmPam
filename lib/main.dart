@@ -36,6 +36,7 @@ class farmPam extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Farmpam',
       home: signInPage(),
       initialRoute: SIGNIN,
@@ -53,3 +54,5 @@ class farmPam extends StatelessWidget {
     );
   }
 }
+
+//Change

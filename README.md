@@ -26,3 +26,6 @@ samples, guidance on mobile development, and a full API reference.
   - 0.21v (20.12.03)
     1. Fixed error 1 - that when existing user is signed in, data in the user database was duplicated.
     2. Fixed error 2 - build the cart page. 
+    
+  - 0.22v
+    1. add google map

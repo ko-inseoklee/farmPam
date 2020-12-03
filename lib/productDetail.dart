@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/assets.dart';
 import 'package:farmpam/signIn.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'main.dart';
 
@@ -19,6 +20,29 @@ class productDetailPage extends StatefulWidget {
 
 class _productDetailPageState extends State<productDetailPage> {
   String title = 'Product Detail';
+
+  final Map<String, Marker> _markers = {};
+
+  get locations => null;
+
+  Future<void> _onMapCreated(GoogleMapController controller) async {
+    final googleOffices = await locations.getGoogleOffices();
+
+    setState(() {
+      _markers.clear();
+      for (final office in googleOffices.offices) {
+        final marker = Marker(
+          markerId: MarkerId(office.name),
+          position: LatLng(office.lat, office.lng),
+          infoWindow: InfoWindow(
+            title: office.name,
+            snippet: office.address,
+          ),
+        );
+        _markers[office.name] = marker;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +100,7 @@ class _productDetailPageState extends State<productDetailPage> {
           String _productID = document.data['ID'];
 
           return ListView(
+            shrinkWrap: true,
             children: [
               Stack(
                 alignment: const Alignment(0.95, -0.9),
@@ -139,9 +164,24 @@ class _productDetailPageState extends State<productDetailPage> {
               ),
               Divider(),
               //TODO: Location will be displayed by API.
-              Container(
-                padding: EdgeInsets.all(16.0),
-                child: Text("there will be location"),
+              // Container(
+              //     padding: EdgeInsets.all(16.0),
+              //     child: GoogleMap(
+              //       onMapCreated: _onMapCreated,
+              //       initialCameraPosition:
+              //           CameraPosition(target: _center, zoom: 11.0),
+              //     )),
+              SizedBox(
+                width: 300,
+                height: 300,
+                child: GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: const LatLng(0, 0),
+                    zoom: 2,
+                  ),
+                  markers: _markers.values.toSet(),
+                ),
               ),
               Divider(),
               Container(

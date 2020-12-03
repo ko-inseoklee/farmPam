@@ -34,6 +34,7 @@ dependencies:
   flutter_signin_button: ^1.0.0
   uuid: 2.2.2
   firebase_storage: ^4.0.0
+  google_maps_flutter: ^1.0.3
 
 dev_dependencies:
   flutter_test:

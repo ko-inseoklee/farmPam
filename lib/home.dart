@@ -10,6 +10,14 @@ import 'cart.dart';
 final FirebaseAuth _auth = FirebaseAuth.instance;
 CollectionReference users = FirebaseFirestore.instance.collection("users");
 
+//product list for main.
+List<DocumentSnapshot> items;
+Stream<QuerySnapshot> product =
+    FirebaseFirestore.instance.collection("product").snapshots();
+
+//variable for search function.
+String searchKeyword;
+
 //cartpage에 쓸 데이터.
 List<dynamic> cartList = new List<dynamic>();
 
@@ -20,6 +28,18 @@ class homePage extends StatefulWidget {
 
 class _homePageState extends State<homePage> {
   String title = 'Main page';
+
+  TextEditingController _controller;
+
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   String get documentId => null;
 
@@ -59,9 +79,6 @@ class _homePageState extends State<homePage> {
     print(name);
     print(description);
 
-    Stream<QuerySnapshot> product =
-        FirebaseFirestore.instance.collection("product").snapshots();
-
     //cart page에 필요한 데이터.
     setState(() {
       setData();
@@ -71,38 +88,57 @@ class _homePageState extends State<homePage> {
       appBar: header(context, title, true),
       body: ListView(
         children: <Widget>[
-          Container(
-            child: Text("Search"),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                child: IconButton(
+                    icon: Icon(Icons.search), onPressed: () => search("")),
+              ),
+              SizedBox(
+                  width: 350,
+                  height: 40,
+                  //TODO: Textbox for searching
+                  child: TextField(
+                    controller: _controller,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: "Search",
+                    ),
+                    onSubmitted: (String value) async {
+                      searchKeyword = value;
+                      await search(value);
+                    },
+                  )),
+            ],
           ),
-          Center(
-            child: SizedBox(
-              height: 80,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //TODO: dropdown menu for sorting
+            children: [
+              SizedBox(
+                height: 40,
+              ),
+              Container(
+                child: Text(
+                  "Product List",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              DropdownButton(items: null, onChanged: null),
+            ],
+          ),
+          Divider(
+            thickness: 1.5,
           ),
           Container(
             child: StreamBuilder<QuerySnapshot>(
               stream: product,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) return LinearProgressIndicator();
-                return _buildList(context, snapshot.data.docs);
-                /*return ListView(
-                  shrinkWrap: true,
-                  children: snapshot.data.docs.map((DocumentSnapshot document) {
-                    if (snapshot.hasError) {
-                      print('Something went wrong');
-                    }
-
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      print("loading");
-                    }
-                    return ListTile(
-                      //Todo: fill component in Listtile Lee
-                      title: Text(document.data()['name']),
-                      onTap: () => Navigator.pushNamed(context, PRODUCTDETAIL,
-                          arguments: document.reference),
-                    );
-                  }).toList(),
-                );*/
+                items = snapshot.data.docs;
+                return _buildList(context, items);
               },
             ),
           )
@@ -159,5 +195,17 @@ class _homePageState extends State<homePage> {
         });
       }
     }
+  }
+
+  //TODO: make search function.
+  StreamBuilder<QuerySnapshot> search(String value) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: product,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return LinearProgressIndicator();
+        items = snapshot.data.docs;
+        return _buildList(context, items);
+      },
+    );
   }
 }
