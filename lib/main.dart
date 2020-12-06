@@ -2,7 +2,9 @@ import 'dart:core';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/addProduct.dart';
+import 'package:farmpam/chat.dart';
 import 'package:farmpam/chatList.dart';
+import 'package:farmpam/editProfile.dart';
 import 'package:farmpam/productDetail.dart';
 import 'package:farmpam/profile.dart';
 import 'package:farmpam/settings.dart';
@@ -20,8 +22,10 @@ final PROFILE = './profile';
 final PRODUCTDETAIL = './productDetail';
 final SETTINGS = './settings';
 final ADDPRODUCT = './addProduct';
+final CHAT = './chat';
 final CHATLIST = './chatList';
 final CART = './cart';
+final EDITPROFILE = './editProfile';
 
 final defaultURL =
     "https://kubalubra.is/wp-content/uploads/2017/11/default-thumbnail.jpg";
@@ -48,8 +52,10 @@ class farmPam extends StatelessWidget {
         PROFILE: (context) => profilePage(),
         //add other pages above.
         CHATLIST: (context) => chatListPage(),
+        CHAT: (context) => chatPage(),
         CART: (context) => cartPage(),
-        PRODUCTDETAIL: (context) => productDetailPage()
+        PRODUCTDETAIL: (context) => productDetailPage(),
+        EDITPROFILE: (context) => editProfilePage(),
       },
     );
   }

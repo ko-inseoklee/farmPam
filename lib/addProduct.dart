@@ -66,7 +66,6 @@ class _addProductPageState extends State<addProductPage> {
       'description': description,
       'lastModified': FieldValue.serverTimestamp(),
       'creatorID': user.uid,
-      'bucketedPeople': [],
       'favoritedPeople': [],
       'location': '',
       'review': [],

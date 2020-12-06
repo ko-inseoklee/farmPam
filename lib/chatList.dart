@@ -7,7 +7,8 @@ class chatListPage extends StatefulWidget {
 }
 
 class _chatListPageState extends State<chatListPage> {
-  String title = "Current chat";
+  //Todo: title will be friend name.
+  String title = "chat List";
 
   @override
   Widget build(BuildContext context) {

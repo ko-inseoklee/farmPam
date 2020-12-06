@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/assets.dart';
 import 'package:farmpam/signIn.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoder/services/base.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'main.dart';
@@ -25,23 +26,68 @@ class _productDetailPageState extends State<productDetailPage> {
 
   get locations => null;
 
-  Future<void> _onMapCreated(GoogleMapController controller) async {
-    final googleOffices = await locations.getGoogleOffices();
+  Future<void> _onMapCreated(GoogleMapController controller) async {}
 
-    setState(() {
-      _markers.clear();
-      for (final office in googleOffices.offices) {
-        final marker = Marker(
-          markerId: MarkerId(office.name),
-          position: LatLng(office.lat, office.lng),
-          infoWindow: InfoWindow(
-            title: office.name,
-            snippet: office.address,
+  final reviewEditController = TextEditingController();
+
+  void dispose() {
+    // Clean up the controller when the widget is removed from the
+    // widget tree.
+    reviewEditController.dispose();
+    super.dispose();
+  }
+
+  _printLatestValue() {
+    print("Second text field: ${reviewEditController.text}");
+  }
+
+  String review;
+
+  //For review
+  void _showDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: Text("Write Review"),
+          content: Row(
+            children: [
+              SizedBox(
+                width: 40,
+                height: 20,
+                child: Text("4.5"),
+              ),
+              SizedBox(
+                width: 150,
+                height: 20,
+                child: TextField(
+                  decoration: InputDecoration(hintText: "Write your review"),
+                  controller: reviewEditController,
+                ),
+              )
+            ],
           ),
+          actions: <Widget>[
+            FlatButton(
+              child: new Text("Write"),
+              onPressed: () {
+                review = reviewEditController.text;
+
+                print(review);
+                // Navigator.pop(context);
+              },
+            ),
+            FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
         );
-        _markers[office.name] = marker;
-      }
-    });
+      },
+    );
   }
 
   @override
@@ -50,36 +96,36 @@ class _productDetailPageState extends State<productDetailPage> {
 
     String productDocument =
         docRef.toString().substring(26, docRef.toString().length - 1);
-    print("docref = $docRef");
-
-    firestore
-        .collection("product")
-        .doc(productDocument)
-        .get()
-        .then((DocumentSnapshot snapshot) async {
-      creator = await snapshot.data()['creatorID'];
-    });
-
-    print("Creator == $creator");
 
     String userDocument =
         currentUser.toString().substring(23, currentUser.toString().length - 1);
 
-    firestore
-        .collection("users")
-        .doc(userDocument)
-        .get()
-        .then((DocumentSnapshot snapshot) async {
-      cUser = await snapshot.data()['uid'];
+    setState(() {
+      //Compare to CreatorID in Product and UID in CurrentUser.
+      firestore
+          .collection("product")
+          .doc(productDocument)
+          .get()
+          .then((DocumentSnapshot snapshot) async {
+        creator = await snapshot.data()['creatorID'];
+      });
+
+      firestore
+          .collection("users")
+          .doc(userDocument)
+          .get()
+          .then((DocumentSnapshot snapshot) async {
+        cUser = await snapshot.data()['uid'];
+      });
+
+      if (creator.compareTo(cUser) == 0) {
+        isCreater = true;
+      } else {
+        isCreater = false;
+      }
+
+      reviewEditController.addListener(_printLatestValue);
     });
-
-    // print("Creator == $creator , cUser == $cUser");
-
-    if (creator.compareTo(cUser) == 0) {
-      isCreater = true;
-    } else {
-      isCreater = false;
-    }
 
     return Scaffold(
       appBar: header(context, title, isCreater),
@@ -175,9 +221,8 @@ class _productDetailPageState extends State<productDetailPage> {
                 width: 300,
                 height: 300,
                 child: GoogleMap(
-                  onMapCreated: _onMapCreated,
                   initialCameraPosition: CameraPosition(
-                    target: const LatLng(0, 0),
+                    target: const LatLng(5, 5),
                     zoom: 2,
                   ),
                   markers: _markers.values.toSet(),
@@ -194,7 +239,7 @@ class _productDetailPageState extends State<productDetailPage> {
                   child: Text("Write Review"),
                   onPressed: () {
                     //TODO: Make a dialog window for writing review and starRating.
-                    print("good");
+                    _showDialog();
                   },
                 ),
               ),

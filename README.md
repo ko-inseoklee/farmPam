@@ -29,3 +29,6 @@ samples, guidance on mobile development, and a full API reference.
     
   - 0.22v
     1. add google map
+    
+  - 0.3v
+    1. build setting page

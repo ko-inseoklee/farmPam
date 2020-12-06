@@ -82,6 +82,7 @@ class _homePageState extends State<homePage> {
     //cart page에 필요한 데이터.
     setState(() {
       setData();
+      print("home currentuser22 == $currentUser");
     });
 
     return Scaffold(
@@ -101,7 +102,7 @@ class _homePageState extends State<homePage> {
                   //TODO: Textbox for searching
                   child: TextField(
                     controller: _controller,
-                    obscureText: true,
+                    obscureText: false,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: "Search",
