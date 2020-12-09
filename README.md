@@ -30,5 +30,9 @@ samples, guidance on mobile development, and a full API reference.
   - 0.22v
     1. add google map
     
-  - 0.3v
+  - 0.3v(20.12.06)
     1. build setting page
+    
+  - 0.4v(20.12.10)
+    1. Add Page - ProductModify, EditProfile
+    2. Modify Page - ProductDetail, AddProduct

@@ -1,4 +1,5 @@
-import "package:flutter/material.dart";
+import 'package:farmpam/assets.dart';
+import 'package:flutter/material.dart';
 
 class profilePage extends StatefulWidget {
   @override
@@ -6,8 +7,14 @@ class profilePage extends StatefulWidget {
 }
 
 class _profilePageState extends State<profilePage> {
+  //Todo: title will be friend name.
+  String title = "Profile";
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      appBar: header(context, title, true),
+      bottomNavigationBar: footer(context),
+    );
   }
 }

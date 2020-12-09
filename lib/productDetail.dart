@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/assets.dart';
 import 'package:farmpam/signIn.dart';
@@ -6,6 +8,7 @@ import 'package:geocoder/services/base.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'main.dart';
+import 'productModify.dart';
 
 bool isCreater;
 
@@ -21,12 +24,16 @@ class productDetailPage extends StatefulWidget {
 
 class _productDetailPageState extends State<productDetailPage> {
   String title = 'Product Detail';
-
-  final Map<String, Marker> _markers = {};
-
+  double rating = 2.5;
+  Map<String, Marker> _markers = {};
+  DocumentReference docRef;
   get locations => null;
-
   Future<void> _onMapCreated(GoogleMapController controller) async {}
+
+  List<dynamic> _review;
+  List<dynamic> _starRatingList;
+  double _starRating;
+  int _ratedPeopleNum;
 
   final reviewEditController = TextEditingController();
 
@@ -41,10 +48,8 @@ class _productDetailPageState extends State<productDetailPage> {
     print("Second text field: ${reviewEditController.text}");
   }
 
-  String review;
-
   //For review
-  void _showDialog() {
+  void _showDialog() async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -54,10 +59,40 @@ class _productDetailPageState extends State<productDetailPage> {
           content: Row(
             children: [
               SizedBox(
-                width: 40,
-                height: 20,
-                child: Text("4.5"),
-              ),
+                  width: 55,
+                  height: 30,
+                  child: DropdownButton<double>(
+                    value: rating,
+                    icon: Icon(Icons.arrow_downward_outlined),
+                    iconSize: 20,
+                    underline: Container(
+                      height: 1,
+                      color: Colors.grey,
+                    ),
+                    onChanged: (double newValue) {
+                      setState(() {
+                        rating = newValue;
+                      });
+                    },
+                    //todo: 별점이 바로 안바뀜.
+                    items: <double>[
+                      0.5,
+                      1.0,
+                      1.5,
+                      2.0,
+                      2.5,
+                      3.0,
+                      3.5,
+                      4.0,
+                      4.5,
+                      5.0
+                    ].map<DropdownMenuItem<double>>((double value) {
+                      return DropdownMenuItem<double>(
+                        value: value,
+                        child: Text(value.toString()),
+                      );
+                    }).toList(),
+                  )),
               SizedBox(
                 width: 150,
                 height: 20,
@@ -73,9 +108,17 @@ class _productDetailPageState extends State<productDetailPage> {
               child: new Text("Write"),
               onPressed: () {
                 review = reviewEditController.text;
-
+                _review.add(review);
+                _starRatingList.add(rating);
+                docRef.update({
+                  'starRating': ((_starRating * _ratedPeopleNum) + rating) /
+                      (_ratedPeopleNum + 1),
+                  'starRatingList': _starRatingList,
+                  'review': _review,
+                  //todo: 리뷰 쓴 사람 리스트 저장해서 두번 못 쓰도록..?
+                });
                 print(review);
-                // Navigator.pop(context);
+                Navigator.pop(context);
               },
             ),
             FlatButton(
@@ -90,9 +133,11 @@ class _productDetailPageState extends State<productDetailPage> {
     );
   }
 
+  String review;
+
   @override
   Widget build(BuildContext context) {
-    DocumentReference docRef = ModalRoute.of(context).settings.arguments;
+    docRef = ModalRoute.of(context).settings.arguments;
 
     String productDocument =
         docRef.toString().substring(26, docRef.toString().length - 1);
@@ -141,10 +186,13 @@ class _productDetailPageState extends State<productDetailPage> {
           }
 
           String _name = document.data['name'];
-          String _starRating = document.data['starRating'].toString();
           String _price = document.data['price'].toString();
           String _productID = document.data['ID'];
-
+          _ratedPeopleNum = document.data['review'].length;
+          _review = document.data['review'];
+          _starRatingList = document.data['starRatingList'];
+          _starRating = document.data['starRating'].toDouble();
+          String _farmName = document.data['farmName'];
           return ListView(
             shrinkWrap: true,
             children: [
@@ -157,6 +205,15 @@ class _productDetailPageState extends State<productDetailPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
+                        isCreater
+                            ? IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            productModifyPage(docRef))))
+                            : Text(''),
                         IconButton(
                             icon: Icon(Icons.add_shopping_cart),
                             onPressed: () async {
@@ -199,11 +256,27 @@ class _productDetailPageState extends State<productDetailPage> {
                   children: [
                     Column(
                       children: [
-                        Text(_name),
+                        Container(
+                            child: FlatButton(
+                          child: Text(_farmName + '\'s farm'),
+
+                          onPressed: () {},
+                          //TODO: farmPage로 가기.
+                        ))
                       ],
                     ),
                     Column(
-                      children: [Text(_starRating), Text('₩$_price')],
+                      children: [
+                        Text(_starRating.toString()),
+                        Text('₩$_price'),
+                        FlatButton(
+                          child: Text('Chat with the farmer'),
+                          onPressed: () {},
+                          //TODO: Chat Page로 가기 with _productID(이게 creator UID).
+                          //TODO: 현재 유저와 농장 주인과 채팅 데이터베이스 형성
+                          //TODO: Chat page로 이동.
+                        )
+                      ],
                     )
                   ],
                 ),
@@ -243,7 +316,19 @@ class _productDetailPageState extends State<productDetailPage> {
                   },
                 ),
               ),
-              //TODO: put the List of Reviews.
+              Container(
+                  child: Row(
+                children: <Widget>[
+                  //TODO: add star icon
+                  Column(children: [
+                    Text('별점'),
+                    for (var re in _starRatingList) Text(re.toString())
+                  ]),
+                  SizedBox(width: 20),
+                  Column(
+                      children: [Text('내용'), for (var re in _review) Text(re)]),
+                ],
+              )),
             ],
           );
         },

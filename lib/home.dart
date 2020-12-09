@@ -57,6 +57,8 @@ class _homePageState extends State<homePage> {
     if (currentUser == null) {
       users.add({
         'address': "",
+        'addressLat': 0,
+        'addressLong': 0,
         'cart': [],
         'chatList': [],
         'favorite': [],
@@ -70,6 +72,8 @@ class _homePageState extends State<homePage> {
         'farmReview': [],
         'farmName': '',
         'farmLocation': '',
+        'farmLocationLat': 0,
+        'farmLocationLong': 0,
         'image': '',
       }).then((value) => {currentUser = value});
     }

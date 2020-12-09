@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/main.dart';
+import 'package:farmpam/signIn.dart';
 import 'package:flutter/material.dart';
 
 Widget header(BuildContext context, String pageTitle, bool isCreater) {
@@ -8,14 +9,9 @@ Widget header(BuildContext context, String pageTitle, bool isCreater) {
     centerTitle: true,
     actions: [
       // TODO: Change add button to write button.
-      isCreater
-          ? IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () => Navigator.pushNamed(context, ADDPRODUCT))
-          : Text(""),
       IconButton(
-          icon: Icon(Icons.person),
-          onPressed: () => Navigator.pushNamed(context, PROFILE)),
+          icon: Icon(Icons.shopping_cart),
+          onPressed: () => Navigator.pushNamed(context, CART)),
       IconButton(
           icon: Icon(Icons.settings),
           onPressed: () => Navigator.pushNamed(context, SETTINGS))
@@ -27,7 +23,7 @@ Widget header(BuildContext context, String pageTitle, bool isCreater) {
 }
 
 Widget footer(BuildContext context) {
-  List<String> routeList = [CHATLIST, HOME, CART];
+  List<String> routeList = [CHATLIST, HOME, ADDPRODUCT];
 
   return BottomNavigationBar(
     items: const <BottomNavigationBarItem>[
@@ -40,15 +36,45 @@ Widget footer(BuildContext context) {
         label: "Home",
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.shopping_cart),
-        label: "My cart",
+        icon: Icon(Icons.add),
+        label: "Write",
       ),
     ],
     //TODO:Change the color proper.
     selectedItemColor: Colors.grey,
     unselectedItemColor: Colors.grey,
-    onTap: (index) {
-      Navigator.pushNamed(context, routeList[index]);
+    onTap: (index) async {
+      if (index == 2) {
+        String userDocref = currentUser
+            .toString()
+            .substring(24, currentUser.toString().length - 1);
+        print(userDocref);
+        await FirebaseFirestore.instance
+            .collection("users")
+            .doc(userDocref)
+            .get()
+            .then((DocumentSnapshot documentSnapshot) {
+          bool isFarmer = documentSnapshot.data()['isVerified'];
+          if (isFarmer) {
+            Navigator.pushNamed(context, routeList[index]);
+          } else {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text("Register your farmer location first."),
+                    actions: [
+                      FlatButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text("cancel"))
+                    ],
+                  );
+                });
+          }
+        });
+      } else {
+        Navigator.pushNamed(context, routeList[index]);
+      }
     },
   );
 }
@@ -58,7 +84,6 @@ Widget buildListTile(BuildContext context, DocumentSnapshot documentSnapshot) {
   if (_description.length >= 10) {
     _description = _description.substring(0, 10);
   }
-
   return ListTile(
     //TODO: getURL after Image upload.
     //TODO: set condition between default and image

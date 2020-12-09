@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/assets.dart';
 import 'package:farmpam/productDetail.dart';
 import 'package:farmpam/signIn.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 import 'home.dart';
@@ -23,6 +24,47 @@ List<DocumentReference> productRef = new List<DocumentReference>();
 class _cartPageState extends State<cartPage> {
   //Todo: title will be friend name.
   String title = "cart";
+
+  _showDialog(BuildContext context, int index) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Delete on your cart?"),
+            actions: [
+              FlatButton(
+                  onPressed: () {
+                    setState(() {
+                      //TODO: Delete element of cartlist
+                      name.removeAt(index);
+                      image.removeAt(index);
+                      location.removeAt(index);
+                      starRating.removeAt(index);
+                      price.removeAt(index);
+                      cartList.removeAt(index);
+
+                      String userDoc = currentUser
+                          .toString()
+                          .substring(24, currentUser.toString().length - 1);
+                      print("cart userDoc == userDoc");
+
+                      //TODO: Delete element of database or update current cartlist
+                      FirebaseFirestore.instance
+                          .collection("users")
+                          .doc(userDoc)
+                          .update({'cart': cartList}).then(
+                              (value) => print("update successfully."));
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: Text("Delete")),
+              FlatButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("Cancel"))
+            ],
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +97,11 @@ class _cartPageState extends State<cartPage> {
             ),
             onTap: () => Navigator.pushNamed(context, PRODUCTDETAIL,
                 arguments: productRef[index]),
+            onLongPress: () {
+              _showDialog(context, index);
+              print(cartList);
+              print("index == $index");
+            },
           );
         },
       ),
