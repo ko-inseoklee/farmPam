@@ -36,3 +36,5 @@ samples, guidance on mobile development, and a full API reference.
   - 0.4v(20.12.10)
     1. Add Page - ProductModify, EditProfile
     2. Modify Page - ProductDetail, AddProduct
+  - 0.41v
+    1. update image //firestore

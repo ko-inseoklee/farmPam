@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/main.dart';
 import 'package:farmpam/signIn.dart';
+import 'package:firebase_image/firebase_image.dart';
 import 'package:flutter/material.dart';
 
 Widget header(BuildContext context, String pageTitle, bool isCreater) {
@@ -87,9 +88,9 @@ Widget buildListTile(BuildContext context, DocumentSnapshot documentSnapshot) {
   return ListTile(
     //TODO: getURL after Image upload.
     //TODO: set condition between default and image
-    leading: true /*documentSnapshot.data()['name'] == '1'*/
+    leading: documentSnapshot.data()['image'] == ''
         ? Image.network(defaultURL)
-        : Image.network(documentSnapshot.data()['name']),
+        : Image(image: FirebaseImage(documentSnapshot.data()['image'])),
     title: Text(documentSnapshot.data()['name']),
     subtitle: Text(_description + '...'),
     trailing: Column(

@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/assets.dart';
 import 'package:farmpam/signIn.dart';
+import 'package:firebase_image/firebase_image.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/services/base.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -16,6 +17,9 @@ FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 String creator = '';
 String cUser = '';
+String _image = '';
+double pLat = 0;
+double pLong = 0;
 
 class productDetailPage extends StatefulWidget {
   @override
@@ -153,7 +157,15 @@ class _productDetailPageState extends State<productDetailPage> {
           .get()
           .then((DocumentSnapshot snapshot) async {
         creator = await snapshot.data()['creatorID'];
+        pLat = await snapshot.data()['farmLocationLat'];
+        pLong = await snapshot.data()['farmLocationLong'];
+        _image = await snapshot.data()['image'];
       });
+
+      final farmerLocation = Marker(
+          markerId: MarkerId("FarmLocation"), position: LatLng(pLat, pLong));
+      _markers.clear();
+      _markers["current"] = farmerLocation;
 
       firestore
           .collection("users")
@@ -199,7 +211,9 @@ class _productDetailPageState extends State<productDetailPage> {
               Stack(
                 alignment: const Alignment(0.95, -0.9),
                 children: [
-                  Image.network(true ? defaultURL : document.data['image']),
+                  _image == ''
+                      ? Image.network(defaultURL)
+                      : Image(image: FirebaseImage(_image)),
                   Container(
                     padding: EdgeInsets.all(8.0),
                     child: Row(
@@ -295,8 +309,8 @@ class _productDetailPageState extends State<productDetailPage> {
                 height: 300,
                 child: GoogleMap(
                   initialCameraPosition: CameraPosition(
-                    target: const LatLng(5, 5),
-                    zoom: 2,
+                    target: LatLng(pLat, pLong),
+                    zoom: 13,
                   ),
                   markers: _markers.values.toSet(),
                 ),

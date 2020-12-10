@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/assets.dart';
 import 'package:farmpam/productDetail.dart';
 import 'package:farmpam/signIn.dart';
+import 'package:firebase_image/firebase_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
@@ -82,9 +83,9 @@ class _cartPageState extends State<cartPage> {
           return ListTile(
             //TODO: getURL after Image upload.
             //TODO: set condition between default and image
-            leading: true /*documentSnapshot.data()['name'] == '1'*/
+            leading: image[index] == ''
                 ? Image.network(defaultURL)
-                : Image.network(image[index]),
+                : Image(image: FirebaseImage(image[index])),
             title: Text(name[index]),
             subtitle: Text(description[index]),
             trailing: Column(

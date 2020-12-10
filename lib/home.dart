@@ -171,7 +171,7 @@ class _homePageState extends State<homePage> {
       }
     });
 
-    if (cartList.length != name.length) {
+    if (cartList.length != name.length && cartList.length != 0) {
       name.removeRange(0, name.length);
       image.removeRange(0, image.length);
       location.removeRange(0, location.length);

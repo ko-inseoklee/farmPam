@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/assets.dart';
 import 'package:farmpam/main.dart';
+import 'package:farmpam/profile.dart';
 import 'package:farmpam/signIn.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
