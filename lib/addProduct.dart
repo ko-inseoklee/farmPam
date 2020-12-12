@@ -18,7 +18,8 @@ class addProductPage extends StatefulWidget {
 
 class _addProductPageState extends State<addProductPage> {
   String userDocument =
-      currentUser.toString().substring(23, currentUser.toString().length - 1);
+  currentUser.toString().substring(23, currentUser.toString().length - 1);
+  var searchKeyword;
 
   final databaseReference = FirebaseFirestore.instance;
   String title = "Add Product";
@@ -35,6 +36,16 @@ class _addProductPageState extends State<addProductPage> {
   String _farmName;
   double _farmLocationLat;
   double _farmLocationLong;
+
+  List<dynamic> setSearchKeyword(String productName) {
+    List<String> caseSearchList = List();
+    String temp = "";
+    for (int i = 0; i < productName.length; i++) {
+      temp = temp + productName[i];
+      caseSearchList.add(temp);
+    }
+    return caseSearchList;
+  }
 
   Future getImage() async {
     final _picker = ImagePicker();
@@ -55,7 +66,7 @@ class _addProductPageState extends State<addProductPage> {
 
   Future uploadFile(String productName) async {
     StorageReference storageReference =
-        FirebaseStorage.instance.ref().child('product/$tempID');
+    FirebaseStorage.instance.ref().child('product/$tempID');
     StorageUploadTask storageUploadTask = storageReference.putFile(_image);
     await storageUploadTask.onComplete;
     storageReference.getDownloadURL().then((fileURL) {
@@ -66,7 +77,7 @@ class _addProductPageState extends State<addProductPage> {
   }
 
   void uploadProduct(String tempName, String price, String description,
-      String category) async {
+      String category,  var keyword) async {
     await databaseReference.collection("product").doc(tempID).set({
       'name': tempName,
       'price': int.parse(price),
@@ -84,7 +95,7 @@ class _addProductPageState extends State<addProductPage> {
       'farmName': _farmName,
       'farmLocationLat': _farmLocationLat,
       'farmLocationLong': _farmLocationLong,
-      //TODO: add category to firestore
+      'searchKeyword' : keyword,
     });
   }
 
@@ -189,12 +200,14 @@ class _addProductPageState extends State<addProductPage> {
               Builder(builder: (context) {
                 return FlatButton(
                   onPressed: () async {
+                    searchKeyword = setSearchKeyword(productName.text);
+
                     if (dropdownValue == 'Category') {
                       Scaffold.of(context).showSnackBar(
                           SnackBar(content: Text('카테고리를 골라주세요.')));
                     } else {
                       uploadProduct(productName.text, productPrice.text,
-                          productDescription.text, dropdownValue);
+                          productDescription.text, dropdownValue,searchKeyword);
                       uploadFile(productName.text);
                       Navigator.of(context).pop();
                     }
