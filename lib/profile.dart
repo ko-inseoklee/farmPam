@@ -65,6 +65,16 @@ class _profilePageState extends State<profilePage> {
               markers: _markers.values.toSet(),
             ),
           ),
+          SizedBox(
+            height: 30,
+          ),
+          Container(
+              padding: EdgeInsets.all(16.0),
+              child: FlatButton(
+                  onPressed: () =>
+                      Navigator.pushNamed(context, FARMPAGE),
+                  child: Text("Farm Page")))
+
         ],
       ),
       bottomNavigationBar: footer(context),
