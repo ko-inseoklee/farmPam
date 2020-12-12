@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/main.dart';
 import 'package:farmpam/signIn.dart';
@@ -15,6 +17,9 @@ List<DocumentSnapshot> items;
 Stream<QuerySnapshot> product =
     FirebaseFirestore.instance.collection("product").snapshots();
 
+CollectionReference productCollection =
+    FirebaseFirestore.instance.collection("product");
+
 //variable for search function.
 String searchKeyword;
 
@@ -28,8 +33,11 @@ class homePage extends StatefulWidget {
 
 class _homePageState extends State<homePage> {
   String title = 'Main page';
-
+  var userLat;
+  var userLong;
+  var userAddr;
   TextEditingController _controller;
+  bool isSearching = false;
 
   void initState() {
     super.initState();
@@ -50,43 +58,82 @@ class _homePageState extends State<homePage> {
             snapshots.map((data) => buildListTile(context, data)).toList());
   }
 
+  StreamBuilder<QuerySnapshot> search(String value) {
+    print("search");
+    print(value);
+    return StreamBuilder<QuerySnapshot>(
+      stream: productCollection
+          .where('searchKeyword', arrayContains: value)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return LinearProgressIndicator();
+        items = snapshot.data.docs;
+        return _buildList(context, items);
+      },
+    );
+  }
+
+  StreamBuilder<QuerySnapshot> queryProducts(
+      var minUserLat, var maxUserLat, var userAddr) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: productCollection
+          .where('farmLocationLat',
+              isGreaterThan: minUserLat == null ? 0 : minUserLat - 5)
+          .where('farmLocationLat',
+              isLessThan: maxUserLat == null ? 0 : maxUserLat + 5)
+          .where('location', isEqualTo: userAddr)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return LinearProgressIndicator();
+        items = snapshot.data.docs;
+        return _buildList(context, items);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    User user = _auth.currentUser;
-
-    if (currentUser == null) {
-      users.add({
-        'address': "",
-        'addressLat': 0,
-        'addressLong': 0,
-        'cart': [],
-        'chatList': [],
-        'favorite': [],
-        'like': [],
-        'isVerified': true,
-        'nickName': user.displayName,
-        'sellingProducts': [],
-        'uid': user.uid,
-        'farmDescription': '',
-        'farmImage': '',
-        'farmReview': [],
-        'farmName': '',
-        'farmLocation': '',
-        'farmLocationLat': 0,
-        'farmLocationLong': 0,
-        'image': '',
-      }).then((value) => {currentUser = value});
-    }
-    print("home currentuser == $currentUser");
-
-    print(cartList);
-    print(name);
-    print(description);
+    //
+    // if (currentUser == null) {
+    //   users.add({
+    //     'address': "",
+    //     'addressLat': 0,
+    //     'addressLong': 0,
+    //     'cart': [],
+    //     'chatList': [],
+    //     'favorite': [],
+    //     'like': [],
+    //     'isVerified': true,
+    //     'nickName': user.displayName,
+    //     'sellingProducts': [],
+    //     'uid': user.uid,
+    //     'farmDescription': '',
+    //     'farmImage': '',
+    //     'farmReview': [],
+    //     'farmName': '',
+    //     'farmLocation': '',
+    //     'farmLocationLat': 0,
+    //     'farmLocationLong': 0,
+    //     'image': '',
+    //   }).then((value) => {currentUser = value});
+    // }
+    // print("home currentuser == $currentUser");
+    //
+    // print(cartList);
+    // print(name);
+    // print(description);
 
     //cart page에 필요한 데이터.
     setState(() {
-      setData();
-      print("home currentuser22 == $currentUser");
+      setData(user.uid);
+      print("useraddr lat== $userLat");
+    });
+
+    sleep(Duration(seconds: 1));
+
+    setState(() {
+      setData(user.uid);
+      print("useraddr lat 33 == $userLat");
     });
 
     return Scaffold(
@@ -98,10 +145,17 @@ class _homePageState extends State<homePage> {
             children: [
               Container(
                 child: IconButton(
-                    icon: Icon(Icons.search), onPressed: () => search("")),
+                    icon: Icon(Icons.search),
+                    onPressed: () {
+                      setState(() {
+                        _controller.text == ''
+                            ? isSearching = false
+                            : isSearching = true;
+                      });
+                    }),
               ),
               SizedBox(
-                  width: 350,
+                  width: 250,
                   height: 40,
                   //TODO: Textbox for searching
                   child: TextField(
@@ -112,8 +166,11 @@ class _homePageState extends State<homePage> {
                       labelText: "Search",
                     ),
                     onSubmitted: (String value) async {
-                      searchKeyword = value;
-                      await search(value);
+                      setState(() {
+                        _controller.text == ''
+                            ? isSearching = false
+                            : isSearching = true;
+                      });
                     },
                   )),
             ],
@@ -127,7 +184,7 @@ class _homePageState extends State<homePage> {
               ),
               Container(
                 child: Text(
-                  "Product List",
+                  "Product List in $userAddr",
                   style: TextStyle(fontSize: 20),
                 ),
               ),
@@ -138,36 +195,31 @@ class _homePageState extends State<homePage> {
             thickness: 1.5,
           ),
           Container(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: product,
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) return LinearProgressIndicator();
-                items = snapshot.data.docs;
-                return _buildList(context, items);
-              },
-            ),
-          )
+              child: isSearching
+                  ? search(_controller.text)
+                  : queryProducts(userLat, userLat, userAddr))
         ],
       ),
       bottomNavigationBar: footer(context),
     );
   }
 
-  Future<void> setData() async {
-    String userdoc =
-        currentUser.toString().substring(24, currentUser.toString().length - 1);
+  void setData(String user) async {
+    User user = _auth.currentUser;
 
     await FirebaseFirestore.instance
         .collection("users")
-        .doc(userdoc)
+        .where('uid', isEqualTo: user.uid)
         .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      int len = documentSnapshot.data()['cart'].length;
-
+        .then((value) {
+      int len = value.docs[0].data()['cart'].length;
+      userLat = value.docs[0].data()['addressLat'];
+      userLong = value.docs[0].data()['addressLong'];
+      userAddr = value.docs[0].data()['address'];
       cartList.removeRange(0, cartList.length);
 
       for (int i = 0; i < len; i++) {
-        cartList.insert(i, documentSnapshot.data()['cart'][i]);
+        cartList.insert(i, value.docs[0].data()['cart'][i]);
       }
     });
 
@@ -202,15 +254,6 @@ class _homePageState extends State<homePage> {
     }
   }
 
-  //TODO: make search function.
-  StreamBuilder<QuerySnapshot> search(String value) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: product,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return LinearProgressIndicator();
-        items = snapshot.data.docs;
-        return _buildList(context, items);
-      },
-    );
-  }
+//TODO: make search function.
+
 }

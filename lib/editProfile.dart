@@ -19,6 +19,8 @@ String _farmName = '';
 String _farmDescription = '';
 double _farmLat;
 double _farmLong;
+String locDropdownValue = 'Location';
+String farmLocDropdonwValue = 'Location';
 
 class editProfilePage extends StatefulWidget {
   @override
@@ -58,13 +60,37 @@ class _editProfilePageState extends State<editProfilePage> {
             padding: EdgeInsets.all(16.0),
             child: Text("- Set Location"),
           ),
+          Center(
+            child: DropdownButton<String>(
+              value: locDropdownValue,
+              icon: Icon(Icons.arrow_downward_outlined),
+              iconSize: 20,
+              underline: Container(
+                height: 1,
+                color: Colors.grey,
+              ),
+              onChanged: (String newValue) {
+                setState(() {
+                  locDropdownValue = newValue;
+                  addressToLocation addr = new addressToLocation(newValue);
+                });
+              },
+              items: <String>['Location', '장량동', '환호동', '두호동', '흥해']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+          ),
           SizedBox(
             //TODO: update lat,long when mark picked.
             width: 300,
             height: 300,
             child: GoogleMap(
               initialCameraPosition: CameraPosition(
-                target: LatLng(37.52, 126.92),
+                target: LatLng(36.0609, 129.3417),
                 zoom: 14,
               ),
               onMapCreated: (GoogleMapController controller) {},
@@ -140,13 +166,40 @@ class _editProfilePageState extends State<editProfilePage> {
                   child: Text(""),
                 ),
           _isFarmer
+              ? Center(
+                  child: DropdownButton<String>(
+                    value: farmLocDropdonwValue,
+                    icon: Icon(Icons.arrow_downward_outlined),
+                    iconSize: 20,
+                    underline: Container(
+                      height: 1,
+                      color: Colors.grey,
+                    ),
+                    onChanged: (String newValue) {
+                      setState(() {
+                        farmLocDropdonwValue = newValue;
+                      });
+                    },
+                    items: <String>['Location', '장량동', '환호동', '두호동', '흥해']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                )
+              : Container(
+                  child: Text(""),
+                ),
+          _isFarmer
               ? SizedBox(
                   //TODO: update lat,long when mark picked.
                   width: 300,
                   height: 300,
                   child: GoogleMap(
                     initialCameraPosition: CameraPosition(
-                      target: LatLng(37.52, 126.92),
+                      target: LatLng(36.0609, 129.3417),
                       zoom: 14,
                     ),
                     onMapCreated: (GoogleMapController controller) {},
@@ -170,42 +223,115 @@ class _editProfilePageState extends State<editProfilePage> {
           Divider(),
           FlatButton(
               onPressed: () async {
-                String userDoc = currentUser
-                    .toString()
-                    .substring(24, currentUser.toString().length - 1);
-
-                if (_isFarmer) {
-                  await FirebaseFirestore.instance
-                      .collection("users")
-                      .doc(userDoc)
-                      .update({
-                    "nickName": _nickName,
-                    "addressLat": _userLat,
-                    "addressLong": _userLong,
-                    "isVerified": true,
-                    "farmName": _farmName,
-                    "farmDescription": _farmDescription,
-                    "farmLocationLat": _farmLat,
-                    "farmLocationLong": _farmLong
-                  });
+                if (ModalRoute.of(context).settings.arguments == null) {
+                  String userDoc = currentUser
+                      .toString()
+                      .substring(24, currentUser.toString().length - 1);
+                  if (_isFarmer) {
+                    await FirebaseFirestore.instance
+                        .collection("users")
+                        .doc(userDoc)
+                        .update({
+                      "nickName": _nickName,
+                      "address": locDropdownValue,
+                      "addressLat": _userLat,
+                      "addressLong": _userLong,
+                      "isVerified": true,
+                      "farmName": _farmName,
+                      "farmLocation": farmLocDropdonwValue,
+                      "farmDescription": _farmDescription,
+                      "farmLocationLat": _farmLat,
+                      "farmLocationLong": _farmLong
+                    });
+                  } else {
+                    await FirebaseFirestore.instance
+                        .collection("users")
+                        .doc(userDoc)
+                        .update({
+                      "nickName": _nickName,
+                      "address": locDropdownValue,
+                      "addressLat": _userLat,
+                      "addressLong": _userLong,
+                      "isVerified": false,
+                    });
+                  }
                 } else {
-                  await FirebaseFirestore.instance
-                      .collection("users")
-                      .doc(userDoc)
-                      .update({
-                    "nickName": _nickName,
-                    "addressLat": _userLat,
-                    "addressLong": _userLong,
-                    "isVerified": false,
-                  });
+                  if (_isFarmer) {
+                    await FirebaseFirestore.instance.collection("users").add({
+                      "nickName": _nickName,
+                      "address": locDropdownValue,
+                      "addressLat": _userLat,
+                      "addressLong": _userLong,
+                      "isVerified": true,
+                      "farmName": _farmName,
+                      "farmLocation": farmLocDropdonwValue,
+                      "farmDescription": _farmDescription,
+                      "farmLocationLat": _farmLat,
+                      "farmLocationLong": _farmLong,
+                      'cart': [],
+                      'chatList': [],
+                      'favorite': [],
+                      'like': [],
+                      'sellingProducts': [],
+                      'uid': user.uid,
+                      'farmImage': '',
+                      'farmReview': [],
+                      'image': '',
+                    });
+                  } else {
+                    await FirebaseFirestore.instance.collection("users").add({
+                      "nickName": _nickName,
+                      "address": locDropdownValue,
+                      "addressLat": _userLat,
+                      "addressLong": _userLong,
+                      "isVerified": false,
+                      'cart': [],
+                      'chatList': [],
+                      'favorite': [],
+                      'like': [],
+                      'isVerified': false,
+                      'sellingProducts': [],
+                      'uid': user.uid,
+                      'farmDescription': '',
+                      'farmImage': '',
+                      'farmReview': [],
+                      'farmName': '',
+                      'farmLocation': '',
+                      'farmLocationLat': 0,
+                      'farmLocationLong': 0,
+                      'image': '',
+                    });
+                  }
                 }
-                Navigator.pushNamed(context, SETTINGS);
+                Navigator.pushNamed(context, HOME);
               },
               child: Text("Edit Profile"))
         ],
       ),
       bottomNavigationBar: footer(context),
     );
+  }
+}
+
+class addressToLocation {
+  String address;
+  double latitude;
+  double longitude;
+
+  addressToLocation(String address) {
+    if (address == "장량동") {
+      this.latitude = 36.0702;
+      this.longitude = 129.3789;
+    } else if (address == "환호동") {
+      this.latitude = 36.0707;
+      this.longitude = 129.3971;
+    } else if (address == "두호동") {
+      this.latitude = 36.0609;
+      this.longitude = 129.3800;
+    } else {
+      this.latitude = 36.1071;
+      this.longitude = 129.3417;
+    }
   }
 }
 

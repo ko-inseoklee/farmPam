@@ -12,6 +12,10 @@ class settingPage extends StatefulWidget {
   _settingPageState createState() => _settingPageState();
 }
 
+String userName = "";
+double userLat = 0;
+double userLong = 0;
+
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class _settingPageState extends State<settingPage> {
@@ -56,6 +60,16 @@ class _settingPageState extends State<settingPage> {
   Widget build(BuildContext context) {
     userDoc =
         currentUser.toString().substring(24, currentUser.toString().length - 1);
+
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(userDoc)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      userName = documentSnapshot.data()['nickName'];
+      userLat = documentSnapshot.data()['addressLat'];
+      userLong = documentSnapshot.data()['addressLong'];
+    });
 
     print("setting : $userDoc");
 

@@ -17,8 +17,7 @@ class addProductPage extends StatefulWidget {
 }
 
 class _addProductPageState extends State<addProductPage> {
-  String userDocument =
-      currentUser.toString().substring(23, currentUser.toString().length - 1);
+  var searchKeyword;
 
   final databaseReference = FirebaseFirestore.instance;
   String title = "Add Product";
@@ -31,10 +30,21 @@ class _addProductPageState extends State<addProductPage> {
   final productPrice = TextEditingController();
   final productDescription = TextEditingController();
   String dropdownValue = 'Category';
+  String locDropdownValue = 'Location';
 
   String _farmName;
   double _farmLocationLat;
   double _farmLocationLong;
+
+  List<dynamic> setSearchKeyword(String productName) {
+    List<String> caseSearchList = List();
+    String temp = "";
+    for (int i = 0; i < productName.length; i++) {
+      temp = temp + productName[i];
+      caseSearchList.add(temp);
+    }
+    return caseSearchList;
+  }
 
   Future getImage() async {
     final _picker = ImagePicker();
@@ -66,17 +76,17 @@ class _addProductPageState extends State<addProductPage> {
   }
 
   void uploadProduct(String tempName, String price, String description,
-      String category) async {
+      String category, String location, var keyword) async {
     await databaseReference.collection("product").doc(tempID).set({
       'name': tempName,
       'price': int.parse(price),
-      'image': "product/$tempID",
+      'image': "gs://farmpam-20e67.appspot.com/product/$tempID",
       'ID': tempID,
       'description': description,
       'lastModified': FieldValue.serverTimestamp(),
       'creatorID': user.uid,
       'favoritedPeople': [],
-      'location': '',
+      'location': location,
       'review': [],
       'starRating': 0,
       'starRatingList': [],
@@ -84,7 +94,7 @@ class _addProductPageState extends State<addProductPage> {
       'farmName': _farmName,
       'farmLocationLat': _farmLocationLat,
       'farmLocationLong': _farmLocationLong,
-      //TODO: add category to firestore
+      'searchKeyword': keyword,
     });
   }
 
@@ -121,6 +131,29 @@ class _addProductPageState extends State<addProductPage> {
                 onPressed: () {
                   getImage();
                 },
+              ),
+              Center(
+                child: DropdownButton<String>(
+                  value: locDropdownValue,
+                  icon: Icon(Icons.arrow_downward_outlined),
+                  iconSize: 20,
+                  underline: Container(
+                    height: 1,
+                    color: Colors.grey,
+                  ),
+                  onChanged: (String newValue) {
+                    setState(() {
+                      locDropdownValue = newValue;
+                    });
+                  },
+                  items: <String>['Location', '장량동', '환호동', '두호동', '흥해']
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
               ),
               Center(
                 child: DropdownButton<String>(
@@ -189,12 +222,19 @@ class _addProductPageState extends State<addProductPage> {
               Builder(builder: (context) {
                 return FlatButton(
                   onPressed: () async {
+                    searchKeyword = setSearchKeyword(productName.text);
+
                     if (dropdownValue == 'Category') {
                       Scaffold.of(context).showSnackBar(
                           SnackBar(content: Text('카테고리를 골라주세요.')));
                     } else {
-                      uploadProduct(productName.text, productPrice.text,
-                          productDescription.text, dropdownValue);
+                      uploadProduct(
+                          productName.text,
+                          productPrice.text,
+                          productDescription.text,
+                          dropdownValue,
+                          locDropdownValue,
+                          searchKeyword);
                       uploadFile(productName.text);
                       Navigator.of(context).pop();
                     }

@@ -14,6 +14,17 @@ class _chatPageState extends State<chatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: header(context, title, true),
+      body: ListView(
+        children: [
+          Container(
+            alignment: true ? Alignment.centerLeft : Alignment.centerRight,
+            child: ListTile(
+              title: Text("Test"),
+              subtitle: Text("12:00"),
+            ),
+          )
+        ],
+      ),
       bottomNavigationBar: footer(context),
     );
   }

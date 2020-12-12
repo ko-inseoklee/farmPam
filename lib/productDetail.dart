@@ -285,10 +285,13 @@ class _productDetailPageState extends State<productDetailPage> {
                         Text('₩$_price'),
                         FlatButton(
                           child: Text('Chat with the farmer'),
-                          onPressed: () {},
-                          //TODO: Chat Page로 가기 with _productID(이게 creator UID).
-                          //TODO: 현재 유저와 농장 주인과 채팅 데이터베이스 형성
-                          //TODO: Chat page로 이동.
+                          onPressed: () {
+                            //TODO: Chat Page로 가기 with _productID(이게 creator UID).
+                            //TODO: 현재 유저와 농장 주인과 채팅 데이터베이스 형성
+
+                            //TODO: Chat page로 이동.
+                            Navigator.pushNamed(context, CHAT);
+                          },
                         )
                       ],
                     )

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmpam/main.dart';
 import 'package:farmpam/signIn.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_image/firebase_image.dart';
 import 'package:flutter/material.dart';
 
@@ -46,16 +47,15 @@ Widget footer(BuildContext context) {
     unselectedItemColor: Colors.grey,
     onTap: (index) async {
       if (index == 2) {
-        String userDocref = currentUser
-            .toString()
-            .substring(24, currentUser.toString().length - 1);
+        String userDocref = FirebaseAuth.instance.currentUser.uid;
         print(userDocref);
         await FirebaseFirestore.instance
             .collection("users")
-            .doc(userDocref)
+            .where('uid', isEqualTo: userDocref)
             .get()
-            .then((DocumentSnapshot documentSnapshot) {
-          bool isFarmer = documentSnapshot.data()['isVerified'];
+            .then((value) {
+          currentUser = value.docs[0].reference;
+          bool isFarmer = value.docs[0].data()['isVerified'];
           if (isFarmer) {
             Navigator.pushNamed(context, routeList[index]);
           } else {

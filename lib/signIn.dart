@@ -149,37 +149,29 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
       }
       final user = userCredential.user;
 
-      await configuration(snapshot);
-      Navigator.pushNamed(context, HOME);
+      bool inID = false;
+
+      await FirebaseFirestore.instance
+          .collection("users")
+          .where('uid', isEqualTo: user.uid)
+          .get()
+          .then((value) {
+        if (value.docs.length != 0) {
+          inID = true;
+        } else {
+          currentUser = value.docs[0].reference;
+        }
+      });
+
+      if (!inID) {
+        Navigator.pushNamed(context, EDITPROFILE, arguments: false);
+      } else {
+        Navigator.pushNamed(context, HOME);
+      }
     } catch (e) {
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text("Failed to sign in with Google: ${e}"),
       ));
     }
-  }
-
-  Future<void> configuration(AsyncSnapshot<QuerySnapshot> snapshot) async {
-    snapshot.data.docs.map((DocumentSnapshot document) async {
-      String temp = await document.data()['uid'];
-      if (temp == user.uid) {
-        print("user in configuration : ${user.uid}");
-        print("this is document ref !! = ${document.reference}");
-        currentUser = document.reference;
-        containsID = true;
-
-        print("this is ID == $containsID");
-      }
-    }).toList();
-
-    // firestore
-    //     .collection("user")
-    //     .doc(docRef)
-    //     .get()
-    //     .then((DocumentSnapshot snapshot) async {
-    //   creator = await snapshot.data()['creatorID'];
-    // });
-    // sleep(Duration.zero);
-
-    // print("signin=$currentUser");
   }
 }
