@@ -38,6 +38,7 @@ dependencies:
   geolocator: ^6.0.0
   geocoder: 0.2.1
   firebase_image: 0.2.0
+  url_launcher: 5.7.10
 
 dev_dependencies:
   flutter_test:

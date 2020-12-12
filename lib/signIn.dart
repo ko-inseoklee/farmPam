@@ -156,14 +156,17 @@ class __signInWithGoogleState extends State<_signInWithGoogle> {
           .where('uid', isEqualTo: user.uid)
           .get()
           .then((value) {
-        if (value.docs.length != 0) {
+        print(value.docs.length);
+        if (value.docs.length == 0) {
+          print("Here : database not exists.");
           inID = true;
         } else {
+          print("Signin: Already exists in database.");
           currentUser = value.docs[0].reference;
         }
       });
 
-      if (!inID) {
+      if (inID) {
         Navigator.pushNamed(context, EDITPROFILE, arguments: false);
       } else {
         Navigator.pushNamed(context, HOME);

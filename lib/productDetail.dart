@@ -7,7 +7,7 @@ import 'package:firebase_image/firebase_image.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/services/base.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'main.dart';
 import 'productModify.dart';
 
@@ -143,6 +143,7 @@ class _productDetailPageState extends State<productDetailPage> {
   Widget build(BuildContext context) {
     docRef = ModalRoute.of(context).settings.arguments;
 
+    print(currentUser);
     String productDocument =
         docRef.toString().substring(26, docRef.toString().length - 1);
 
@@ -184,6 +185,7 @@ class _productDetailPageState extends State<productDetailPage> {
       reviewEditController.addListener(_printLatestValue);
     });
 
+    print(_image);
     return Scaffold(
       appBar: header(context, title, isCreater),
       body: StreamBuilder<DocumentSnapshot>(
@@ -212,8 +214,8 @@ class _productDetailPageState extends State<productDetailPage> {
                 alignment: const Alignment(0.95, -0.9),
                 children: [
                   _image == ''
-                      ? Image.network(defaultURL)
-                      : Image(image: FirebaseImage(_image)),
+                      ? Center(child: Image.network(defaultURL))
+                      : Center(child: Image(image: FirebaseImage("$_image"))),
                   Container(
                     padding: EdgeInsets.all(8.0),
                     child: Row(
@@ -276,6 +278,11 @@ class _productDetailPageState extends State<productDetailPage> {
 
                           onPressed: () {},
                           //TODO: farmPage로 가기.
+                        )),
+                        Container(
+                            child: TextButton(
+                          child: Text("010-2776-5098"),
+                          onPressed: () => launch("tel://821027765098"),
                         ))
                       ],
                     ),
