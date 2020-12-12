@@ -9,6 +9,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'cart.dart';
 
+String theUid;
+
 final FirebaseAuth _auth = FirebaseAuth.instance;
 CollectionReference users = FirebaseFirestore.instance.collection("users");
 
@@ -38,7 +40,7 @@ class _homePageState extends State<homePage> {
   var userAddr;
   TextEditingController _controller;
   bool isSearching = false;
-
+  String dropdownValue = 'Category';
   void initState() {
     super.initState();
     _controller = TextEditingController();
@@ -188,7 +190,27 @@ class _homePageState extends State<homePage> {
                   style: TextStyle(fontSize: 20),
                 ),
               ),
-              DropdownButton(items: null, onChanged: null),
+              DropdownButton<String>(
+                value: dropdownValue,
+                icon: Icon(Icons.arrow_downward_outlined),
+                iconSize: 20,
+                underline: Container(
+                  height: 1,
+                  color: Colors.grey,
+                ),
+                onChanged: (String newValue) {
+                  setState(() {
+                    dropdownValue = newValue;
+                  });
+                },
+                items: <String>['Category', '과일', '채소', '견과류', '곡물']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
             ],
           ),
           Divider(
@@ -216,6 +238,7 @@ class _homePageState extends State<homePage> {
       userLat = value.docs[0].data()['addressLat'];
       userLong = value.docs[0].data()['addressLong'];
       userAddr = value.docs[0].data()['address'];
+      theUid = value.docs[0].data()['uid'];
       cartList.removeRange(0, cartList.length);
 
       for (int i = 0; i < len; i++) {
